@@ -77,16 +77,16 @@ p{margin:0 0 1em;text-wrap:pretty}
 /* hero */
 .hero{position:relative;min-height:clamp(560px,80svh,760px);overflow:hidden;isolation:isolate}
 .hero-vis{position:absolute;top:68px;bottom:0;right:max(0px,calc((100vw - 1440px)/2));width:min(62vw,1000px);z-index:-1;pointer-events:none}
-.hero-wg{position:absolute;left:-6%;top:6%;width:78%;
+.hero-wg{position:absolute;left:-2%;top:6%;width:76%;
   -webkit-mask-image:linear-gradient(to right,transparent 0,#000 22%,#000 62%,transparent 92%),linear-gradient(to bottom,#000 0,#000 74%,transparent 100%);-webkit-mask-composite:source-in;
   mask-image:linear-gradient(to right,transparent 0,#000 22%,#000 62%,transparent 92%),linear-gradient(to bottom,#000 0,#000 74%,transparent 100%);mask-composite:intersect}
 .hero-photo{position:absolute;right:0;bottom:0;height:94%;max-width:52%;aspect-ratio:4/5;
-  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 36%,#000 92%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 7%,#000 84%,transparent 100%);-webkit-mask-composite:source-in;
-  mask-image:linear-gradient(to right,transparent 0,#000 36%,#000 92%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 7%,#000 84%,transparent 100%);mask-composite:intersect}
+  -webkit-mask-image:radial-gradient(54% 62% at 52% 46%,#000 62%,rgba(0,0,0,0) 100%);
+  mask-image:radial-gradient(54% 62% at 52% 46%,#000 62%,rgba(0,0,0,0) 100%)}
 .hero-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 8%}
 .hero .wrap{position:relative;min-height:inherit;display:flex;flex-direction:column;justify-content:center;padding-top:92px;padding-bottom:48px}
 .hero-copy{max-width:min(520px,40vw)}
-.hero h1{font-size:clamp(42px,4.6vw,70px)}
+.hero h1{font-size:clamp(42px,4.2vw,62px)}
 .hero-copy .lede{margin:22px 0 32px}
 .cta{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px}
 .trust{border-block:1px solid var(--line);font:600 13px/1.4 var(--ui);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
@@ -287,9 +287,10 @@ footer a:hover{color:var(--ink)}
 .panel header{display:flex;justify-content:space-between;align-items:center;padding:22px 26px;border-bottom:1px solid var(--line)}
 .panel .body{padding:26px;overflow:auto;flex:1}
 .panel .body p{color:var(--ink-soft);font-size:17px}
-.panel .cal{margin-top:20px;border-radius:14px;background:#fff;box-shadow:0 0 0 1px var(--line);min-height:420px;display:grid;place-items:center;overflow:hidden}
-.panel .cal iframe{width:100%;height:620px;border:0}
-.panel .cal .wait{font:500 14px/1.4 var(--ui);color:var(--ink-soft)}
+.panel-steps{list-style:none;counter-reset:ps;margin:22px 0 28px;padding:0;display:grid;gap:14px}
+.panel-steps li{counter-increment:ps;display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;font-size:17px;color:var(--ink-soft)}
+.panel-steps li::before{content:counter(ps);width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--teal);display:grid;place-items:center;font:700 14px/1 var(--head);color:var(--ink)}
+.panel-steps b{color:var(--ink);font-weight:400}
 .panel .alt{font:500 14px/1.5 var(--ui);color:var(--ink-soft);margin-top:14px}
 
 @media (prefers-reduced-motion:reduce){
@@ -597,8 +598,13 @@ footer a:hover{color:var(--ink)}
   <header><div><p class="about-offer" id="panel-offer" hidden></p><h2 id="panel-h" style="font-size:24px">Start a conversation</h2></div><button class="x" data-close aria-label="Close">×</button></header>
   <div class="body">
     <p>30 or 45 minutes on Zoom. A real conversation, not a pitch: about where you are and what you’re building. If it seems a good fit, I’ll write you a clear proposal.</p>
-    <div class="cal" id="cal"><span class="wait">Loading calendar…</span></div>
-    <p class="alt">Calendar not showing? <a id="zcal-link" href="https://zcal.co/lukegilbert/start" data-track="panel-zcal-link">Open it in a new tab →</a></p>
+    <ol class="panel-steps">
+      <li><span><b>Choose a time</b> that suits you, 30 or 45 minutes.</span></li>
+      <li><span><b>Tell me a little</b> about where you are, if you’d like.</span></li>
+      <li><span><b>We meet on Zoom.</b> I’ll send the link.</span></li>
+    </ol>
+    <a class="btn" id="zcal-link" href="https://zcal.co/lukegilbert/start" target="_blank" rel="noopener" data-track="panel-zcal-link">Choose a time <span class="arr">→</span></a>
+    <p class="alt">Opens my booking calendar in a new tab.</p>
   </div>
 </dialog>
 
@@ -615,16 +621,14 @@ if(from)$$('a[href^="https://lukegilbert.substack.com"],a[href^="https://zcal.co
 const v=$('#viewer'),vi=$('#viewer-img');
 $$('.wg-card').forEach(b=>b.addEventListener('click',()=>{vi.src=`assets/wg-${b.dataset.wg}-1600.webp`;vi.alt=b.dataset.title+' Wisdogram';$('#viewer-title').textContent=b.dataset.title;v.showModal()}));
 /* booking panel: remembers which offer the person came from */
-const p=$('#panel'),cal=$('#cal'),po=$('#panel-offer'),zl=$('#zcal-link');
+const p=$('#panel'),po=$('#panel-offer'),zl=$('#zcal-link');
 const zurl=o=>{const u=new URL('https://zcal.co/lukegilbert/start');if(from)u.searchParams.set('utm_source',from);u.searchParams.set('utm_medium','landing');if(o)u.searchParams.set('utm_content',o.toLowerCase().replace(/\s+/g,'-'));return u.toString()};
 const track=k=>{if(window.goatcounter?.count)goatcounter.count({path:k,event:true})};
 $$('[data-open-panel]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();
  const o=b.dataset.offer||'';po.hidden=!o;po.textContent=o?'About '+o.toLowerCase():'';
- const src=zurl(o);zl.href=src;track(b.dataset.track||'conversation');p.showModal();
- let f=cal.querySelector('iframe');
- if(!f){f=document.createElement('iframe');f.title='Book a conversation';f.onload=()=>cal.querySelector('.wait')?.remove();cal.appendChild(f)}
- if(f.dataset.src!==src){f.dataset.src=src;f.src=src}
+ zl.href=zurl(o);track(b.dataset.track||'conversation');p.showModal();
 }));
+zl.addEventListener('click',()=>track('zcal-open'+(po.hidden?'':'-'+po.textContent.replace('About ','').replace(/\s+/g,'-'))));
 $$('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]'))d.close()})});
 /* where are you? */
 const map=$('#map'),offers=$('#offers');
