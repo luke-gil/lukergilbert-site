@@ -643,6 +643,8 @@ $$('[data-open-panel]').forEach(b=>b.addEventListener('click',e=>{e.preventDefau
  zl.href=zurl(o);track(b.dataset.track||'conversation');p.showModal();
 }));
 zl.addEventListener('click',()=>track('zcal-open'+(po.hidden?'':'-'+po.textContent.replace('About ','').replace(/\s+/g,'-'))));
+/* count every other tracked link (Substack, library, subscribe, about) */
+$$('[data-track]:not([data-open-panel]):not(#zcal-link)').forEach(l=>l.addEventListener('click',()=>track(l.dataset.track)));
 $$('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]'))d.close()})});
 /* where are you? */
 const map=$('#map'),offers=$('#offers');
