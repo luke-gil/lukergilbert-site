@@ -7,6 +7,10 @@
 <meta name="description" content="Spiritual direction, life coaching and transition coaching for Christian founders and leaders who want to discern what matters and build it well. Plus free Wisdograms and writing.">
 <link rel="canonical" href="https://lukergilbert.com/">
 <meta name="theme-color" content="#f8f7f5">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="assets/favicon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Discern what matters. Build it well. · Luke Gilbert">
 <meta property="og:description" content="Spiritual direction and coaching for Christian founders and leaders, plus free Wisdograms on building what matters.">
@@ -66,13 +70,29 @@ p{margin:0 0 1em;text-wrap:pretty}
 /* header */
 .top{position:fixed;inset:0 0 auto;z-index:50;transition:transform .35s var(--ease),background .3s,box-shadow .3s}
 .top .wrap{display:flex;align-items:center;gap:28px;height:68px}
-.brand{font:700 20px/1 var(--head);text-decoration:none;letter-spacing:-.01em;margin-right:auto}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;margin-right:auto;min-width:0}
+.brand img{width:36px;height:36px;border-radius:50%;flex:none;object-fit:cover;box-shadow:0 0 0 1px var(--line)}
+.brand b{font:700 20px/1 var(--head);letter-spacing:-.01em;white-space:nowrap}
 .nav{display:flex;gap:26px}
 .nav a{font:600 15px/1 var(--ui);text-decoration:none;color:var(--ink-soft);transition:color .2s}
 .nav a:hover{color:var(--ink)}
 .top.scrolled{background:rgba(248,247,245,.78);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);box-shadow:0 1px 0 var(--line)}
 .top.hide{transform:translateY(-100%)}
-@media (max-width:760px){.nav{display:none}}
+.menu-btn{display:none;appearance:none;border:0;background:transparent;width:42px;height:42px;border-radius:8px;cursor:pointer;padding:0;flex:none;place-content:center;gap:5px}
+.menu-btn span{display:block;width:22px;height:2px;border-radius:2px;background:var(--ink);transition:transform .25s var(--ease),opacity .2s}
+.menu-btn:hover{background:rgba(46,40,42,.06)}
+.menu-btn[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.menu-btn[aria-expanded="true"] span:nth-child(2){opacity:0}
+.menu-btn[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+@media (max-width:760px){
+  .menu-btn{display:grid}
+  .top .wrap{gap:10px}
+  .nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;background:var(--paper);padding:4px var(--gut) 14px;border-bottom:1px solid var(--line);box-shadow:0 18px 30px -24px rgba(46,40,42,.45)}
+  .nav.open{display:flex}
+  .nav a{font-size:17px;padding:15px 0;border-bottom:1px solid var(--line)}
+  .nav a:last-child{border-bottom:0}
+}
+@media (max-width:430px){.brand b{display:none}}
 
 /* hero */
 .hero{position:relative;min-height:clamp(560px,80svh,760px);overflow:hidden;isolation:isolate}
@@ -336,13 +356,14 @@ footer a:hover{color:var(--ink)}
 
 <header class="top" id="top-bar">
   <div class="wrap">
-    <a class="brand" href="#top">Luke Gilbert</a>
-    <nav class="nav" aria-label="Sections">
+    <a class="brand" href="#top" aria-label="Luke Gilbert, back to top"><img src="assets/luke-avatar.webp" alt="" width="36" height="36"><b>Luke Gilbert</b></a>
+    <nav class="nav" id="site-nav" aria-label="Sections">
       <a href="#wisdograms">Wisdograms</a>
       <a href="#writing">Writing</a>
       <a href="#work-with-us">Work with me</a>
     </nav>
     <button class="btn ghost sm" data-open-panel data-track="header-conversation">Start a conversation</button>
+    <button class="menu-btn" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </header>
 
@@ -647,6 +668,13 @@ zl.addEventListener('click',()=>track('zcal-open'+(po.hidden?'':'-'+po.textConte
 /* count every other tracked link (Substack, library, subscribe, about) */
 $$('[data-track]:not([data-open-panel]):not(#zcal-link)').forEach(l=>l.addEventListener('click',()=>track(l.dataset.track)));
 $$('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]'))d.close()})});
+/* phone menu */
+const mb=$('.menu-btn'),nav=$('#site-nav');
+if(mb&&nav){const setOpen=o=>{nav.classList.toggle('open',o);mb.setAttribute('aria-expanded',o)};
+ mb.addEventListener('click',e=>{e.stopPropagation();const o=!nav.classList.contains('open');setOpen(o);if(o)track('menu-open')});
+ document.addEventListener('click',e=>{if(!e.target.closest('#site-nav')||e.target.closest('#site-nav a'))setOpen(false)});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)});
+ addEventListener('scroll',()=>{if(nav.classList.contains('open')&&bar.classList.contains('hide'))setOpen(false)},{passive:true});}
 /* where are you? */
 const map=$('#map'),offers=$('#offers');
 $$('[data-pick]').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.pick;map.classList.add('chosen');
